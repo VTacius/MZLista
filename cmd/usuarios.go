@@ -16,36 +16,52 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"xibalba.com/vtacius/MZLista/base"
+	"xibalba.com/vtacius/MZLista/utils"
 )
 
 // usuariosCmd represents the usuarios command
 var usuariosCmd = &cobra.Command{
 	Use:   "usuarios",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Lista los usuarios de correo",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("usuarios called")
+		salida := os.Stdout
+		filtro := "(ObjectClass=zimbraAccount)"
+
+		paraCSV, _ := cmd.Flags().GetBool("csv")
+		dominio, _ := cmd.Flags().GetString("dominio")
+		atributos, _ := cmd.Flags().GetStringArray("atributos")
+
+		baseDN := utils.ConstruirBase(dominio)
+		url, usuario, contrasenia := utils.ParametrosAccesoLdap()
+
+		conexion, err := base.Conectar(url, usuario, contrasenia)
+		if err != nil {
+			utils.Ruptura("Error al conectarse", err)
+		}
+
+		usuarios := base.Acceso{Base: baseDN, Cliente: conexion}
+		usuarios.Buscar(filtro, atributos).Listar()
+		if usuarios.Err != nil {
+			utils.Ruptura("Error al listar usuarios", usuarios.Err)
+		}
+
+		// Imprime el resultado en pantalla en el formato requerido
+		if paraCSV {
+			usuarios.ParaCSV(salida)
+		} else {
+			usuarios.Imprimir(salida)
+		}
+
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(usuariosCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// usuariosCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// usuariosCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	usuariosCmd.Flags().Bool("csv", false, "Muestra el resultado como CSV")
+	usuariosCmd.Flags().StringP("dominio", "d", "sv", "Dominio sobre el cual buscar")
+	usuariosCmd.Flags().StringArrayP("atributos", "a", []string{"uid", "displayName"}, "Atributos a buscar")
 }
