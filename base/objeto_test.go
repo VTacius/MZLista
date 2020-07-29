@@ -3,7 +3,7 @@ package base_test
 import (
 	"testing"
 
-	"xibalba.com/vtacius/zlistar/base"
+	"xibalba.com/vtacius/MZLista/base"
 )
 
 func TestTabular(t *testing.T) {
@@ -30,7 +30,7 @@ func TestEnumerar(t *testing.T) {
 var casosTabular = []struct {
 	attrs      []string
 	longitudes map[string]int
-	atributos  map[string]base.Atributo
+	atributos  map[string]string
 	esperado   string
 	mensaje    string
 }{
@@ -39,8 +39,8 @@ var casosTabular = []struct {
 		map[string]int{
 			"atributo": 5,
 		},
-		map[string]base.Atributo{
-			"atributo": base.Atributo{"valor", 5},
+		map[string]string{
+			"atributo": "valor",
 		},
 		"| valor |",
 		"Caso mínimo",
@@ -51,9 +51,9 @@ var casosTabular = []struct {
 			"atributo": 7,
 			"attrs":    7,
 		},
-		map[string]base.Atributo{
-			"atributo": base.Atributo{"valor", 5},
-			"attrs":    base.Atributo{"value", 5},
+		map[string]string{
+			"atributo": "valor",
+			"attrs":    "value",
 		},
 		"| valor   | value   |",
 		"Verifica que el tamaño dependa de longitudes",
@@ -62,23 +62,23 @@ var casosTabular = []struct {
 
 var casosEnumerar = []struct {
 	attrs     []string
-	atributos map[string]base.Atributo
+	atributos map[string]string
 	esperado  string
 	mensaje   string
 }{
 	{
 		[]string{"atributo"},
-		map[string]base.Atributo{
-			"atributo": base.Atributo{"valor", 5},
+		map[string]string{
+			"atributo": "valor",
 		},
 		"'valor';",
 		"Caso mínimo",
 	},
 	{
 		[]string{"atributo", "attrs"},
-		map[string]base.Atributo{
-			"atributo": base.Atributo{"valor", 5},
-			"attrs":    base.Atributo{"value", 5},
+		map[string]string{
+			"atributo": "valor",
+			"attrs":    "value",
 		},
 		"'valor';'value';",
 		"Primer caso funcional",

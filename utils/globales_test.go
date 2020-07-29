@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"xibalba.com/vtacius/zlistar/utils"
+	"xibalba.com/vtacius/MZLista/utils"
 )
 
 func TestParametrosAccesoLdap(t *testing.T) {

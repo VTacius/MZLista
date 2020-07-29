@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/go-ldap/ldap/v3"
+	"xibalba.com/vtacius/MZLista/utils"
 )
 
 // Acceso : Establece la conexión y operaciones LDAP
@@ -32,12 +34,12 @@ func (acceso *Acceso) Buscar(filtro string, atributos []string) *Acceso {
 	return acceso
 }
 
-func obtenerObjeto(entrada *ldap.Entry, atributos []string) map[string]Atributo {
-	resultado := make(map[string]Atributo)
+func obtenerObjeto(entrada *ldap.Entry, atributos []string) map[string]string {
+	resultado := make(map[string]string)
 	for _, clave := range atributos {
 		valor := strings.TrimSpace(entrada.GetAttributeValue(clave))
 		if valor != "" {
-			resultado[clave] = Atributo{valor, len(valor)}
+			resultado[clave] = valor
 		}
 	}
 	return resultado
@@ -55,7 +57,23 @@ func (acceso *Acceso) Listar() *Acceso {
 	}
 
 	acceso.Datos = resultado
+	return acceso
+}
 
+// FiltrarInactivos : Reduce la lista a sólo aquellos usuarios cuyo periodo de inactividad sea tal
+func (acceso *Acceso) FiltrarInactivos(periodoInactividad float64) *Acceso {
+	hoy := time.Now()
+	var resultado []Objeto
+	for item := range acceso.Datos {
+		fecha := utils.Fechador(acceso.Datos[item].Atributos["zimbraLastLogonTimestamp"])
+		if utils.RevisarIntervalo(periodoInactividad, hoy, fecha) == 1 {
+			nuevo := acceso.Datos[item]
+			nuevo.Atributos["zimbraLastLogonTimestamp"] = fecha.Format(time.RFC822)
+			resultado = append(resultado, nuevo)
+		}
+	}
+
+	acceso.Datos = resultado
 	return acceso
 }
 
@@ -67,8 +85,9 @@ func obtenerLongitudes(attrs *[]string, datos *[]Objeto) map[string]int {
 
 	for _, item := range *datos {
 		for _, clave := range *attrs {
-			if item.Atributos[clave].Longitud > longitudes[clave] {
-				longitudes[clave] = item.Atributos[clave].Longitud
+			l := len(item.Atributos[clave])
+			if l > longitudes[clave] {
+				longitudes[clave] = l
 			}
 		}
 	}

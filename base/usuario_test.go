@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"xibalba.com/vtacius/zlistar/base"
+	"xibalba.com/vtacius/MZLista/base"
 )
 
 func TestObtenerLongitudes(t *testing.T) {
@@ -27,9 +27,9 @@ var casosObtenerLongitudes = []struct {
 		listaAtributos: []string{"atributo", "attr"},
 		datos: []base.Objeto{
 			base.Objeto{
-				Atributos: map[string]base.Atributo{
-					"atributo": base.Atributo{"valor", 5},
-					"attr":     base.Atributo{"value", 5},
+				Atributos: map[string]string{
+					"atributo": "valor",
+					"attr":     "value",
 				},
 			},
 		},

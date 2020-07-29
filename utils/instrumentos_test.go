@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"xibalba.com/vtacius/zlistar/utils"
+	"xibalba.com/vtacius/MZLista/utils"
 )
 
 func TestConstruirBase(t *testing.T) {

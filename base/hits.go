@@ -80,6 +80,32 @@ func (parser *Fichero) Grepear() *Fichero {
 	return parser
 }
 
+// FiltrarIP : Pues que filtra los intentos de conexión por IP
+func (parser *Fichero) FiltrarIP(ipaddress string) *Fichero {
+	intentos := make(map[IntentoAcceso]int)
+	for cliente, intento := range parser.intentos {
+		if cliente.ipaddress == ipaddress {
+			intentos[cliente] = intento
+		}
+	}
+
+	parser.intentos = intentos
+	return parser
+}
+
+// FiltrarUsername : Pues que filtra los intentos de conexión por IP
+func (parser *Fichero) FiltrarUsername(username string) *Fichero {
+	intentos := make(map[IntentoAcceso]int)
+	for cliente, intento := range parser.intentos {
+		if cliente.usuario == username {
+			intentos[cliente] = intento
+		}
+	}
+
+	parser.intentos = intentos
+	return parser
+}
+
 // Ordenar : Cambia el mapa a una lista ordenada
 func (parser *Fichero) Ordenar() (hits []Hits) {
 	var longitudes Longitudes
